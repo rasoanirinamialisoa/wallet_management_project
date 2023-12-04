@@ -13,3 +13,152 @@ tags:
   - name: Currencies
     description: Operations related to currencies
 paths:
+
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        currency:
+          type: array
+          items:
+            $ref: "#/components/schemas/Currency"
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+
+    Currency:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        symbol:
+          type: string
+
+    ResponseStatus:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: OK
+    ResponseBodyTemplate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatus'
+        body:
+          type: object
+
+    BadRequestBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 400
+          message: BAD REQUEST
+        body: { }
+
+
+    ForbiddenRequest:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 403
+          message: FORBIDDEN
+        body: { }
+
+    ServerErrorRequest:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 500
+          message: Internal servor error
+        body: { }
+    AccountListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Account'
+    TransactionListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+    CurrencyListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Currency'
+
+  responses:
+    AccountList_200:
+      description: List of accounts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountListBody'
+    TransactionList_200:
+      description: List of transactions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransactionListBody'
+    CurrencyList_200:
+      description: List of currencies
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CurrencyListBody'
+
+    BadRequest_400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestBody'
+    ForbiddenRequest_403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenRequest'
+    ErrorRequest_500:
+      description: Error request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServerErrorRequest'
