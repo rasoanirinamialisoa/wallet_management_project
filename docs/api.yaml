@@ -13,6 +13,89 @@ tags:
   - name: Currencies
     description: Operations related to currencies
 paths:
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve the list of accounts
+      description: The returne account all ordered
+      operationId: getAccount
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    post:
+      summary: Add a new account
+      tags:
+        - Accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /accounts/{accountId}:
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve details of an account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    put:
+      tags:
+        - Accounts
+      summary: Modify an existing account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
 
 components:
   schemas:
