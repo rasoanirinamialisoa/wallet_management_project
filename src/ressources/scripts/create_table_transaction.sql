@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Transaction (
 
 
 INSERT INTO Transaction (accountId, description, amount, date, type) VALUES
-('123456789', 'Purchase at XYZ Store', 50.00, CURRENT_TIMESTAMP, 'DEBIT');
+('123456781', 'Purchase at XYZ Store', 50.00, CURRENT_TIMESTAMP, 'DEBIT');
 
 
 INSERT INTO Transaction (accountId, description, amount, date, type) VALUES
