@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Account (
 );
 
 INSERT INTO Account (Id, Name, balance, currencyId, accountType) VALUES
-('123456789', 'General Account', 1000.00, 1, 'General');
+('123456781', 'General Account', 1000.00, 1, 'General');
 
 INSERT INTO Account (Id, Name, balance, currencyId, accountType) VALUES
 ('987654321', 'Cash Account', 500.50, 1, 'Cash');
