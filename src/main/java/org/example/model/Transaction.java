@@ -1,5 +1,9 @@
 package org.example.model;
 import lombok.*;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -7,11 +11,16 @@ import lombok.*;
 @ToString
 public class Transaction {
     private int transactionId;
-    private String accountId;
+    private int accountId;
     private String description;
     private double amount;
-    private String date;
+    private Timestamp date;
     private String type;
+
+
+    public void setDate(Timestamp timestamp) {
+        this.date = timestamp;
+    }
 
 }
 
