@@ -1,0 +1,9 @@
+openapi: 3.0.3
+info:
+  title: Wallet management
+  version: 1.0.0
+  description: STD22026_STD22020
+servers:
+  - url: https://wallet.com
+
+paths:
