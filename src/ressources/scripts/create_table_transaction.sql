@@ -9,13 +9,13 @@ CREATE TABLE IF NOT EXISTS Transaction (
 
 
 INSERT INTO Transaction (accountId, description, amount, date, type) VALUES
-('123456781', 'Purchase at XYZ Store', 50.00, CURRENT_TIMESTAMP, 'DEBIT');
+( 'Purchase at XYZ Store', 50.00, CURRENT_TIMESTAMP, 'DEBIT');
 
 
 INSERT INTO Transaction (accountId, description, amount, date, type) VALUES
-('987654321', 'Salary Deposit', 2000.00, CURRENT_TIMESTAMP, 'CREDIT');
+( 'Salary Deposit', 2000.00, CURRENT_TIMESTAMP, 'CREDIT');
 
 
 INSERT INTO Transaction (accountId, description, amount, date, type) VALUES
-('555555555', 'Online Shopping', 75.50, CURRENT_TIMESTAMP, 'DEBIT');
+('Online Shopping', 75.50, CURRENT_TIMESTAMP, 'DEBIT');
 
