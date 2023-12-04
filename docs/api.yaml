@@ -254,6 +254,160 @@ paths:
           $ref: "#/components/responses/ForbiddenRequest_403"
         500:
           $ref: "#/components/responses/ErrorRequest_500"
+
+  /currencies:
+    get:
+      summary: Retrieve the list of currencies
+      tags:
+        - Currencies
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    post:
+      summary: Add a new currency
+      tags:
+        - Currencies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /currencies/{currencyId}:
+    get:
+      summary: Retrieve details of a currency
+      tags:
+        - Currencies
+      parameters:
+        - name: currencyId
+          in: path
+          required: true
+          description: Currency ID
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    put:
+      summary: Modify an existing currency
+      tags:
+        - Currencies
+      parameters:
+        - name: currencyId
+          in: path
+          required: true
+          description: Currency ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    delete:
+      summary: Delete a currency
+      tags:
+        - Currencies
+      parameters:
+        - name: currencyId
+          in: path
+          required: true
+          description: Currency ID
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /accounts/{accountId}/currency:
+    get:
+      summary: Retrieve the currency of an account
+      tags:
+        - Currencies
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    put:
+      summary: Update the currency of an account
+      tags:
+        - Currencies
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
 components:
   schemas:
     Account:
