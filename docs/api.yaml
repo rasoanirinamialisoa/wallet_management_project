@@ -96,7 +96,164 @@ paths:
           $ref: "#/components/responses/ForbiddenRequest_403"
         500:
           $ref: "#/components/responses/ErrorRequest_500"
+  /transactions:
+    get:
+      summary: Retrieve the list of transactions
+      tags:
+        - Transactions
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    post:
+      summary: Add a new transaction
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+          200:
+            $ref: "#/components/responses/TransactionList_200"
+          400:
+            $ref: "#/components/responses/BadRequest_400"
+          403:
+            $ref: "#/components/responses/ForbiddenRequest_403"
+          500:
+            $ref: "#/components/responses/ErrorRequest_500"
 
+  /transactions/{transactionId}:
+    get:
+      summary: Retrieve details of a transaction
+      tags:
+        - Transactions
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    put:
+      summary: Modify an existing transaction
+      tags:
+        - Transactions
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /accounts/{accountId}/transactions:
+
+    get:
+      summary: Retrieve transactions of a specific account
+      tags:
+        - Transactions
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          description: Start date for filtering transactions
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date for filtering transactions
+          schema:
+            type: string
+            format: date
+        - name: category
+          in: query
+          description: Transaction category for filtering
+          schema:
+            type: string
+        - name: minAmount
+          in: query
+          description: Minimum transaction amount for filtering
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          description: Maximum transaction amount for filtering
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    post:
+      summary: Add a new transaction to an account
+      tags:
+        - Transactions
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
 components:
   schemas:
     Account:
