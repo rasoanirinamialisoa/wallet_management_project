@@ -5,5 +5,11 @@ info:
   description: STD22026_STD22020
 servers:
   - url: https://wallet.com
-
+tags:
+  - name: Accounts
+    description: Operations related to accounts
+  - name: Transactions
+    description: Operations related to transactions
+  - name: Currencies
+    description: Operations related to currencies
 paths:
