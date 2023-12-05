@@ -339,27 +339,6 @@ paths:
         500:
           $ref: "#/components/responses/ErrorRequest_500"
 
-    delete:
-      summary: Delete a currency
-      tags:
-        - Currencies
-      parameters:
-        - name: currencyId
-          in: path
-          required: true
-          description: Currency ID
-          schema:
-            type: string
-      responses:
-        200:
-          $ref: "#/components/responses/CurrencyList_200"
-        400:
-          $ref: "#/components/responses/BadRequest_400"
-        403:
-          $ref: "#/components/responses/ForbiddenRequest_403"
-        500:
-          $ref: "#/components/responses/ErrorRequest_500"
-
   /accounts/{accountId}/currency:
     get:
       summary: Retrieve the currency of an account
