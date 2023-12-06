@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Account {
-    private int accountid;
+    private int accountId;
     private String name;
     private double balance;
     private int currencyId;

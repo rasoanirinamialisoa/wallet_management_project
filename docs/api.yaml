@@ -12,6 +12,8 @@ tags:
     description: Operations related to transactions
   - name: Currencies
     description: Operations related to currencies
+  - name: FinancialOperations
+    description: Operations related to financial operations
 paths:
   /accounts:
     get:
@@ -184,7 +186,7 @@ paths:
     get:
       summary: Retrieve transactions of a specific account
       tags:
-        - Transactions
+        - FinancialOperations
       parameters:
         - name: accountId
           in: path
@@ -231,7 +233,7 @@ paths:
     post:
       summary: Add a new transaction to an account
       tags:
-        - Transactions
+        - FinancialOperations
       parameters:
         - name: accountId
           in: path
@@ -343,7 +345,7 @@ paths:
     get:
       summary: Retrieve the currency of an account
       tags:
-        - Currencies
+        - FinancialOperations
       parameters:
         - name: accountId
           in: path
@@ -363,7 +365,7 @@ paths:
     put:
       summary: Update the currency of an account
       tags:
-        - Currencies
+        - FinancialOperations
       parameters:
         - name: accountId
           in: path
@@ -396,6 +398,9 @@ components:
           type: integer
         name:
           type: string
+          example: current account
+        balance:
+          type: integer
         transactions:
           type: array
           items:
@@ -410,23 +415,29 @@ components:
       properties:
         id:
           type: integer
+        label:
+          type: string
         amount:
           type: number
-        date:
+        dateOfTransaction:
           type: string
           format: date
-        description:
+        transactionsType:
+          enum:
+            - Withdraw
+            - Deposit
           type: string
 
     Currency:
       type: object
       properties:
-        code:
-          type: string
+        id:
+          type: integer
         name:
           type: string
-        symbol:
+        code:
           type: string
+
 
     ResponseStatus:
       type: object
