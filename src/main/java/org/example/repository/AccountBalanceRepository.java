@@ -84,6 +84,50 @@ public class AccountBalanceRepository {
         return transferHistories;
     }
 
+
+    public void transferMoney(int debitAccountId, int creditAccountId, BigDecimal amount, LocalDateTime transferDate) {
+        try {
+            // Récupérer le taux de change à la date du transfert pour la devise de débit (euros)
+            int euroCurrencyId = 1;
+            BigDecimal exchangeRate = getExchangeRate(transferDate, euroCurrencyId); 
+
+            // Convertir le montant du transfert en euros en Ariary
+            BigDecimal amountInAriary = amount.multiply(exchangeRate);
+
+            // Mettre à jour le solde du compte débiteur (en euros)
+            updateAccountBalance(debitAccountId, amount.negate());
+
+            // Mettre à jour le solde du compte créditeur (en Ariary)
+            updateAccountBalance(creditAccountId, amountInAriary);
+
+            // Enregistrez les détails du transfert dans la table TransferHistory
+            saveTransferHistory(debitAccountId, creditAccountId, amountInAriary, transferDate);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors du transfert d'argent", e);
+        }
+    }
+
+    private void updateAccountBalance(int accountId, BigDecimal amount) throws SQLException {
+        String sql = "UPDATE Account SET balance = balance + ? WHERE accountId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setBigDecimal(1, amount);
+            preparedStatement.setInt(2, accountId);
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    private void saveTransferHistory(int debitAccountId, int creditAccountId, BigDecimal amount, LocalDateTime transferDate) throws SQLException {
+        String sql = "INSERT INTO TransferHistory (debit_account_id, credit_account_id, transfer_amount, transfer_date) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, debitAccountId);
+            preparedStatement.setInt(2, creditAccountId);
+            preparedStatement.setBigDecimal(3, amount);
+            preparedStatement.setObject(4, transferDate);
+            preparedStatement.executeUpdate();
+        }
+    }
+
     private BigDecimal getExchangeRate(LocalDateTime date, int currencyId) {
         String sql = "SELECT value FROM CurrencyValue WHERE id_devise_source = ? AND date_effet <= ? ORDER BY date_effet DESC LIMIT 1";
 
