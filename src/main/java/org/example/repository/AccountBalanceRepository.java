@@ -21,19 +21,38 @@ public class AccountBalanceRepository {
     public BigDecimal getCurrentBalanceInAriary(int accountId) {
         BigDecimal currentBalance = BigDecimal.ZERO;
 
-        // Obtenir tous les transferts liés au compte
-        List<TransferHistoryEntry> transferHistories = getTransferHistoriesForAccount(accountId);
+        try {
+            connection.setAutoCommit(false);
 
-        // Parcourir chaque transfert
-        for (TransferHistoryEntry transfer : transferHistories) {
-            // Obtenir le taux de change au moment du transfert
-            BigDecimal exchangeRate = getExchangeRate(transfer.getTransferDate(), transfer.getCreditAccountId());
+            // Obtenir tous les transferts liés au compte
+            List<TransferHistoryEntry> transferHistories = getTransferHistoriesForAccount(accountId);
 
-            // Convertir le montant du transfert en Ariary
-            BigDecimal transferAmountInAriary = transfer.getTransferAmount().multiply(exchangeRate);
+            // Parcourir chaque transfert
+            for (TransferHistoryEntry transfer : transferHistories) {
+                // Obtenir le taux de change au moment du transfert
+                BigDecimal exchangeRate = getExchangeRate(transfer.getTransferDate(), transfer.getCreditAccountId());
 
-            // Mettre à jour le solde actuel
-            currentBalance = currentBalance.add(transferAmountInAriary);
+                // Convertir le montant du transfert en Ariary
+                BigDecimal transferAmountInAriary = transfer.getTransferAmount().multiply(exchangeRate);
+
+                // Mettre à jour le solde actuel
+                currentBalance = currentBalance.add(transferAmountInAriary);
+            }
+
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace(); // ou loguer l'erreur
+            }
+            throw new RuntimeException("Erreur lors du calcul du solde", e);
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace(); // ou loguer l'erreur
+            }
         }
 
         return currentBalance;
@@ -66,7 +85,6 @@ public class AccountBalanceRepository {
     }
 
     private BigDecimal getExchangeRate(LocalDateTime date, int currencyId) {
-        // Remplacez "CurrencyValue" par le nom réel de votre table dans la base de données
         String sql = "SELECT value FROM CurrencyValue WHERE id_devise_source = ? AND date_effet <= ? ORDER BY date_effet DESC LIMIT 1";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -75,8 +93,8 @@ public class AccountBalanceRepository {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    // Récupérer la valeur du taux de change
-                    return resultSet.getBigDecimal("value");
+                    BigDecimal exchangeRate = resultSet.getBigDecimal("value");
+                    return exchangeRate != null ? exchangeRate : BigDecimal.ONE;
                 }
             }
         } catch (SQLException e) {
@@ -85,4 +103,3 @@ public class AccountBalanceRepository {
         return BigDecimal.ONE;
     }
 }
-
