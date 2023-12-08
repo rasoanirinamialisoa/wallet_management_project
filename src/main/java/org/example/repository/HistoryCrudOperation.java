@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryCrudOperation {
-    private static Connection connection;
+    static Connection connection;
 
     public HistoryCrudOperation(Connection connection) {
         this.connection = connection;
@@ -71,4 +71,6 @@ public class HistoryCrudOperation {
 
         return balanceHistories;
     }
+
+
 }
