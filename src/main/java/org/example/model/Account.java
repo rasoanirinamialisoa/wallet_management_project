@@ -17,5 +17,7 @@ public class Account {
     private List<Transaction> transactions;
     private List<Currency> currencies;
 
+    public void setAccountid(int accountid) {
+    }
 }
 

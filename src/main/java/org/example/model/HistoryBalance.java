@@ -1,4 +1,4 @@
-package model;
+package org.example.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,7 +7,10 @@ public class HistoryBalance {
     private LocalDateTime date;
     private BigDecimal balance ;
 
-    public BalanceHistory(LocalDateTime date, BigDecimal balance) {
+    public HistoryBalance(LocalDateTime date, BigDecimal balance) {
+    }
+
+    public void BalanceHistory(LocalDateTime date, BigDecimal balance) {
         this.date = date;
         this.balance = balance;
     }

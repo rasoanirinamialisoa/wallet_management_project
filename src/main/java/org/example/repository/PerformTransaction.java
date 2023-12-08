@@ -1,12 +1,15 @@
 package org.example.repository;
+import org.example.model.Account;
+import org.example.model.Transaction;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 public class PerformTransaction {
-        private AccountCrudOperation accountCrudOperation;
+        private AccountCrudOperations accountCrudOperations;
 
-        public  PerformTransaction(AccountCrudOperation accountCrudOperation) {
-        this.accountCrudOperation = accountCrudOperation;
+        public  PerformTransaction(AccountCrudOperations accountCrudOperations) {
+        this.accountCrudOperations = accountCrudOperations;
     }
 
     public void performTransaction(Account account, double amount, String description, String transactionType) {
@@ -37,8 +40,8 @@ public class PerformTransaction {
     }
     private void saveBalance(Account account) {
         
-        if (accountCrudOperation != null) {
-            accountCrudOperation.saveBalance(account.getAccountId(), account.getBalance());
+        if (accountCrudOperations != null) {
+            accountCrudOperations.saveBalance(account.getAccountId(), account.getBalance());
         }
     }
 }
