@@ -16,7 +16,37 @@ public class TransferHistoryEntry {
         this.transferDate = transferDate;
     }
 
-    // Ajoutez les getters et setters ici
+    public int getDebitAccountId() {
+        return debitAccountId;
+    }
+
+    public void setDebitAccountId(int debitAccountId) {
+        this.debitAccountId = debitAccountId;
+    }
+
+    public int getCreditAccountId() {
+        return creditAccountId;
+    }
+
+    public void setCreditAccountId(int creditAccountId) {
+        this.creditAccountId = creditAccountId;
+    }
+
+    public BigDecimal getTransferAmount() {
+        return transferAmount;
+    }
+
+    public void setTransferAmount(BigDecimal transferAmount) {
+        this.transferAmount = transferAmount;
+    }
+
+    public LocalDateTime getTransferDate() {
+        return transferDate;
+    }
+
+    public void setTransferDate(LocalDateTime transferDate) {
+        this.transferDate = transferDate;
+    }
 
     @Override
     public String toString() {
@@ -28,4 +58,3 @@ public class TransferHistoryEntry {
                 '}';
     }
 }
-
