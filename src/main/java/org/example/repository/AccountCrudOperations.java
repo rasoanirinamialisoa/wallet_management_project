@@ -2,7 +2,6 @@ package org.example.repository;
 
 import org.example.model.Account;
 import org.example.model.Currency;
-import org.example.model.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.example.model.Account.*;
 
 public class AccountCrudOperations implements CrudOperations<Account> {
     private final Connection connection;
@@ -43,7 +44,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
                 for (Account account : toSave) {
                     preparedStatement.setString(1, account.getName());
                     preparedStatement.setDouble(2, account.getBalance());
-                    preparedStatement.setInt(3, account.getCurrencyId());
+                    preparedStatement.setInt(3, account.getCurrencyId().getCurrencyId());
                     preparedStatement.setString(4, account.getAccountType());
                     preparedStatement.addBatch();
                 }
@@ -51,7 +52,6 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // tsy de ilaina le  e.printStackTrace(); ity, aleo aza atao throw ftsn. na try exception ftsn.
         }
         return toSave;
     }
@@ -63,7 +63,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, toSave.getName());
                 preparedStatement.setDouble(2, toSave.getBalance());
-                preparedStatement.setInt(3, toSave.getCurrencyId());
+                preparedStatement.setInt(3, toSave.getCurrencyId().getCurrencyId());
                 preparedStatement.setString(4, toSave.getAccountType());
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -78,14 +78,38 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return null;
     }
 
+    @Override
+    public Currency findById(int accountId) {
+        String query = "SELECT * FROM account WHERE " + ACCOUNT_ID_COLUMN + " = ?";
+        try {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, accountId);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return mapResultSetToAccount(resultSet).getCurrencyId();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Retourner null si aucun compte n'est trouvé avec l'ID spécifié
+    }
+
     private Account mapResultSetToAccount(ResultSet resultSet) throws SQLException {
         Account account = new Account();
-        account.setAccountid(resultSet.getInt("accountid")); /* eviter les magiques au final, string int, tsy at tsy ay // atao constatnt na variable quelques parts. */
-        account.setName(resultSet.getString("name"));
-        account.setBalance(resultSet.getDouble("balance"));
-        account.setCurrencyId(resultSet.getInt("currencyId"));
-        account.setAccountType(resultSet.getString("accountType"));
+        account.setAccountId(resultSet.getInt(ACCOUNT_ID_COLUMN));
+        account.setName(resultSet.getString(NAME_COLUMN));
+        account.setBalance(resultSet.getDouble(BALANCE_COLUMN));
+
+        Currency currency = (Currency) resultSet.getObject(CURRENCY_ID_COLUMN);
+        account.setCurrencyId(currency);
+
+        account.setAccountType(resultSet.getString(ACCOUNT_TYPE_COLUMN));
         return account;
     }
+
+
 }
 

@@ -1,7 +1,9 @@
 package org.example.repository;
 
 
+import org.example.model.Account;
 import org.example.model.Transaction;
+import org.example.model.Currency;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.example.model.Transaction.*;
 
 public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
@@ -38,15 +42,15 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
     @Override
     public List<Transaction> saveAll(List<Transaction> toSave) {
-        String query = "INSERT INTO transaction (accountId, description, amount, date, type) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, account) VALUES (?, ?, ?, ?, ?)";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 for (Transaction transaction : toSave) {
-                    preparedStatement.setInt(1, transaction.getAccountId());
-                    preparedStatement.setString(2, transaction.getDescription());
+                    preparedStatement.setInt(1, transaction.getTransactionId());
+                    preparedStatement.setString(2, transaction.getLabelTransaction());
                     preparedStatement.setDouble(3, transaction.getAmount());
-                    preparedStatement.setTimestamp(4, transaction.getDate());
-                    preparedStatement.setString(5, transaction.getType());
+                    preparedStatement.setTimestamp(4, java.sql.Timestamp.valueOf(transaction.getDateOfTransaction()));
+                    preparedStatement.setInt(5, transaction.getAccountId().getAccountId());
                     preparedStatement.addBatch();
                 }
                 preparedStatement.executeBatch();
@@ -59,14 +63,13 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
     @Override
     public Transaction save(Transaction toSave) {
-        String query = "INSERT INTO transaction (accountId, description, amount, date, type) VALUES (?, ?, ?, ?, ?) RETURNING *";
+        String query = "INSERT INTO transaction (labelTransaction, amount, dateOfTransaction, accountId) VALUES (?, ?, ?, ?, ?) RETURNING *";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setInt(1, toSave.getAccountId());
-                preparedStatement.setString(2, toSave.getDescription());
-                preparedStatement.setDouble(3, toSave.getAmount());
-                preparedStatement.setTimestamp(4, toSave.getDate());
-                preparedStatement.setString(5, toSave.getType());
+                preparedStatement.setString(1, toSave.getLabelTransaction());
+                preparedStatement.setDouble(2, toSave.getAmount());
+                preparedStatement.setObject(3, java.sql.Timestamp.valueOf(toSave.getDateOfTransaction()));
+                preparedStatement.setInt(4, toSave.getAccountId().getAccountId());
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -80,14 +83,35 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         return null;
     }
 
+    @Override
+    public Currency findById(int transactionId) {
+        String query = "SELECT * FROM transaction WHERE " + TRANSACTION_ID_COLUMN + " = ?";
+        try {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, transactionId);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return mapResultSetToTransaction(resultSet).getAccountId().getCurrencyId();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Retourner null si aucune transaction n'est trouvée avec l'ID spécifié
+    }
     private Transaction mapResultSetToTransaction(ResultSet resultSet) throws SQLException {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(resultSet.getInt("transactionId"));
-        transaction.setAccountId(resultSet.getInt("accountId"));
-        transaction.setDescription(resultSet.getString("description"));
-        transaction.setAmount(resultSet.getDouble("amount"));
-        transaction.setDate(resultSet.getTimestamp("date"));
-        transaction.setType(resultSet.getString("type"));
+        transaction.setTransactionId(resultSet.getInt(TRANSACTION_ID_COLUMN));
+        transaction.setLabelTransaction(resultSet.getString(LABEL_COLUMN));
+        transaction.setAmount(resultSet.getDouble(AMOUNT_COLUMN));
+        transaction.setDateOfTransaction(resultSet.getTimestamp(DATE_COLUMN).toLocalDateTime());
+
+        Account account = (Account) resultSet.getObject(ACCOUNT_COLUMN);
+        transaction.setAccountId(account);
+
+
         return transaction;
     }
 }

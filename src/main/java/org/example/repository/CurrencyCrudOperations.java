@@ -9,9 +9,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.example.model.Currency.*;
+
 public class CurrencyCrudOperations implements CrudOperations<Currency> {
 
     private Connection connection;
+
 
     public CurrencyCrudOperations(Connection connection) {
         this.connection = connection;
@@ -73,11 +76,29 @@ public class CurrencyCrudOperations implements CrudOperations<Currency> {
         return null;
     }
 
+    @Override
+    public Currency findById(int currencyId) {
+        String query = "SELECT * FROM currency WHERE " + ID_COLUMN_CURRENCY + " = ?";
+        try {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, currencyId);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return mapResultSetToCurrency(resultSet);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Retourner null si aucune devise n'est trouvée avec l'ID spécifié
+    }
     private Currency mapResultSetToCurrency(ResultSet resultSet) throws SQLException {
         Currency currency = new Currency();
-        currency.setId(resultSet.getInt("currencyid"));
-        currency.setCurrencyCode(resultSet.getString("currencyCode"));
-        currency.setCurrencyName(resultSet.getString("currencyName"));
+        currency.setCurrencyId(resultSet.getInt(ID_COLUMN_CURRENCY));
+        currency.setCurrencyCode(resultSet.getString(CURRENCY_CODE_COLUMN));
+        currency.setCurrencyName(resultSet.getString(CURRENCY_NAME_COLUMN));
         return currency;
     }
 }

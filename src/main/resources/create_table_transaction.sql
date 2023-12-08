@@ -8,12 +8,12 @@ CREATE TABLE IF NOT EXISTS Transaction (
 );
 
 
-INSERT INTO Transaction (labelTransaction, amount, dateOfTransaction, transactionsType) VALUES
+INSERT INTO Transaction (labelTransaction, amount, dateOfTransaction, transactionsType, accountId) VALUES
 ('Salary', 100000, CURRENT_TIMESTAMP, 'Credit',3);
 
-INSERT INTO Transaction (labelTransaction, amount, dateOfTransaction, transactionsType) VALUES
+INSERT INTO Transaction (labelTransaction, amount, dateOfTransaction, transactionsType, accountId) VALUES
     ('Gift christmas', 50000, CURRENT_TIMESTAMP, 'Debit', 2);
 
-INSERT INTO Transaction (labelTransaction, amount, dateOfTransaction, transactionsType) VALUES
+INSERT INTO Transaction (labelTransaction, amount, dateOfTransaction, transactionsType, accountId) VALUES
 ('New shoes', 20000, CURRENT_TIMESTAMP, 'Debit', 1);
 

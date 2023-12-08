@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,14 +53,14 @@ public class Main {
             Account account1 = new Account();
             account1.setName("Compte 1");
             account1.setBalance(1000.0);
-            account1.setCurrencyId(1); // Remplacez par l'ID réel de la devise
-            account1.setAccountType("General");
+            account1.setCurrencyId(new Currency()); // Remplacez par l'ID réel de la devise
+            account1.setAccountType("Bank");
             accountsToSave.add(account1);
 
             Account account2 = new Account();
             account2.setName("Compte 2");
             account2.setBalance(500.0);
-            account2.setCurrencyId(2); // Remplacez par l'ID réel de la devise
+            account2.setCurrencyId(new Currency()); // Remplacez par l'ID réel de la devise
             account2.setAccountType("Cash");
             accountsToSave.add(account2);
 
@@ -75,8 +75,8 @@ public class Main {
             Account newAccount = new Account();
             newAccount.setName("Nouveau Compte");
             newAccount.setBalance(200.0);
-            newAccount.setCurrencyId(3);
-            newAccount.setAccountType("Credit Card");
+            newAccount.setCurrencyId(new Currency());
+            newAccount.setAccountType("Mobile money");
 
             Account savedAccount = accountCrudOperations.save(newAccount);
             logger.info("Compte sauvegardé : {}", savedAccount);
@@ -103,19 +103,19 @@ public class Main {
             List<Transaction> transactionsToSave = new ArrayList<>();
 
             Transaction transaction1 = new Transaction();
-            transaction1.setAccountId(7);
-            transaction1.setDescription("Achat en ligne");
-            transaction1.setAmount(50.0);
-            transaction1.setDate(new Timestamp(System.currentTimeMillis()));
-            transaction1.setType("DEBIT");
+            transaction1.setTransactionId(1);
+            transaction1.setLabelTransaction("Achat en ligne");
+            transaction1.setAmount(100000.0);
+            transaction1.setDateOfTransaction(LocalDateTime.now());
+            transaction1.setAccount(new Account().getCurrencyId());
             transactionsToSave.add(transaction1);
 
             Transaction transaction2 = new Transaction();
-            transaction2.setAccountId(5);
-            transaction2.setDescription("Dépôt de salaire");
-            transaction2.setAmount(2000.0);
-            transaction1.setDate(new Timestamp(System.currentTimeMillis()));
-            transaction2.setType("CREDIT");
+            transaction1.setTransactionId(4);
+            transaction1.setLabelTransaction("Achat en ligne");
+            transaction1.setAmount(2000.0);
+            transaction1.setDateOfTransaction(LocalDateTime.now());
+            transaction1.setAccount(new Account().getCurrencyId());
             transactionsToSave.add(transaction2);
 
 // Appeler la méthode saveAll
@@ -127,11 +127,11 @@ public class Main {
 // Tester la méthode save
             logger.info("Test de la méthode save de TransactionCrudOperations");
             Transaction newTransaction = new Transaction();
-            newTransaction.setAccountId(9); // Remplacez par l'ID réel du compte
-            newTransaction.setDescription("Nouvelle transaction");
-            newTransaction.setAmount(100.0);
-            newTransaction.setDate(new Timestamp(System.currentTimeMillis()));
-            newTransaction.setType("DEBIT");
+            newTransaction.setTransactionId(7);
+            newTransaction.setLabelTransaction("Achat en ligne beotte");
+            newTransaction.setAmount(20900.0);
+            newTransaction.setDateOfTransaction(LocalDateTime.now());
+            newTransaction.setAccount(new Account().getCurrencyId());
 
             Transaction savedTransaction = transactionCrudOperations.save(newTransaction);
             logger.info("Transaction sauvegardée : {}", savedTransaction);
@@ -163,8 +163,8 @@ public class Main {
             currenciesToSave.add(currency1);
 
             Currency currency2 = new Currency();
-            currency2.setCurrencyCode("USD");
-            currency2.setCurrencyName("Dollar américain");
+            currency2.setCurrencyCode("MGA");
+            currency2.setCurrencyName("Ariary");
             currenciesToSave.add(currency2);
 
 // Appeler la méthode saveAll
@@ -176,16 +176,11 @@ public class Main {
 // Tester la méthode save
             logger.info("Test de la méthode save de CurrencyCrudOperations");
             Currency newCurrency = new Currency();
-            newCurrency.setCurrencyCode("GBP");
-            newCurrency.setCurrencyName("Livre sterling");
+            newCurrency.setCurrencyCode("EUR");
+            newCurrency.setCurrencyName("Euro");
 
             Currency savedCurrency = currencyCrudOperations.save(newCurrency);
             logger.info("Devise sauvegardée : {}", savedCurrency);
-
-
-// Tester d'autres méthodes selon vos besoins...
-            logger.info("Tests de CurrencyCrudOperations terminés!");
-
 
 
         } catch (SQLException e) {
