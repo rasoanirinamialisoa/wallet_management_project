@@ -77,6 +77,18 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         }
         return null;
     }
+    public void saveBalance(int accountId, double balance) {
+        String query = "UPDATE account SET balance = ? WHERE accountid = ?";
+        try {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setDouble(1, balance);
+                preparedStatement.setInt(2, accountId);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private Account mapResultSetToAccount(ResultSet resultSet) throws SQLException {
         Account account = new Account();
