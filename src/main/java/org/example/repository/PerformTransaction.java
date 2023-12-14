@@ -12,22 +12,21 @@ public class PerformTransaction {
         this.accountCrudOperations = accountCrudOperations;
     }
 
-    public void performTransaction(Account account, double amount, String description, String transactionType) {
+    public void performTransaction(Account account, double amount, String labelTransaction, String transactionsType) {
         Transaction transaction = new Transaction();
         transaction.setAccountId(account.getAccountId());
-        transaction.setDescription(description);
+        transaction.setLabelTransaction(labelTransaction);
         transaction.setAmount(amount);
-        transaction.setDate(new Timestamp(System.currentTimeMillis()));
-        transaction.setType(transactionType);
+        transaction.setTransactionsType(transactionsType);
 
         if (account.getTransactions() == null) {
             account.setTransactions(new ArrayList<>());
         }
         account.getTransactions().add(transaction);
 
-        if ("credit".equalsIgnoreCase(transactionType)) {
+        if ("credit".equalsIgnoreCase(transactionsType)) {
             account.setBalance(account.getBalance() + amount);
-        } else if ("debit".equalsIgnoreCase(transactionType)) {
+        } else if ("debit".equalsIgnoreCase(transactionsType)) {
             if (amount > account.getBalance()) {
                 throw new IllegalArgumentException("Insufficient funds for debit transaction");
             }

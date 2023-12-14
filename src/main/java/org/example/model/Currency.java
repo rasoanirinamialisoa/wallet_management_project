@@ -6,13 +6,12 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Currency {
-    private int id;
+    private int currencyId;
     private String currencyCode;
     private String currencyName;
-    // private float exchangeRate;
-    // private Date updatedAt;
-    // timestamp: dépendente amle JDBC
-    // instant : timpestamp without timezone. pas notion de fuseau horaire UTC+0
-    //locale date : misy fuseau horaire mintsy
+
+    public static final String CURRENCY_ID = "currencyId";
+    public static final String CURRENCY_CODE = "currencyCode";
+    public static final String CURRENCY_NAME = "currencyName";
 }
 

@@ -13,6 +13,7 @@ import java.util.List;
 
 public class AccountCrudOperations implements CrudOperations<Account> {
     private final Connection connection;
+
     public AccountCrudOperations(Connection connection) {
         this.connection = connection;
     }
@@ -77,6 +78,8 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         }
         return null;
     }
+
+
     public void saveBalance(int accountId, double balance) {
         String query = "UPDATE account SET balance = ? WHERE accountid = ?";
         try {
@@ -92,11 +95,11 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 
     private Account mapResultSetToAccount(ResultSet resultSet) throws SQLException {
         Account account = new Account();
-        account.setAccountid(resultSet.getInt("accountid")); /* eviter les magiques au final, string int, tsy at tsy ay // atao constatnt na variable quelques parts. */
-        account.setName(resultSet.getString("name"));
-        account.setBalance(resultSet.getDouble("balance"));
-        account.setCurrencyId(resultSet.getInt("currencyId"));
-        account.setAccountType(resultSet.getString("accountType"));
+        account.setAccountid(resultSet.getInt(Account.ACCOUNT_ID));
+        account.setName(resultSet.getString(Account.NAME));
+        account.setBalance(resultSet.getDouble(Account.BALANCE));
+        account.setCurrencyId(resultSet.getInt(Account.CURRENCY_ID));
+        account.setAccountType(resultSet.getString(Account.ACCOUNT_TYPE));
         return account;
     }
 }

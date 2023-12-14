@@ -73,11 +73,13 @@ public class CurrencyCrudOperations implements CrudOperations<Currency> {
         return null;
     }
 
+
+
     private Currency mapResultSetToCurrency(ResultSet resultSet) throws SQLException {
         Currency currency = new Currency();
-        currency.setId(resultSet.getInt("currencyid"));
-        currency.setCurrencyCode(resultSet.getString("currencyCode"));
-        currency.setCurrencyName(resultSet.getString("currencyName"));
+        currency.setCurrencyId(resultSet.getInt(Currency.CURRENCY_ID));
+        currency.setCurrencyCode(resultSet.getString(Currency.CURRENCY_CODE));
+        currency.setCurrencyName(resultSet.getString(Currency.CURRENCY_NAME));
         return currency;
     }
 }

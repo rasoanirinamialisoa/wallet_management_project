@@ -1,41 +1,20 @@
 package org.example.model;
 
-import java.math.BigDecimal;
+import lombok.*;
+
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class HistoryBalance {
-    private LocalDateTime date;
-    private BigDecimal balance ;
+    private int historyId;
+    private Timestamp date;
+    private double balance;
 
-    public HistoryBalance(LocalDateTime date, BigDecimal balance) {
-    }
-
-    public void BalanceHistory(LocalDateTime date, BigDecimal balance) {
-        this.date = date;
-        this.balance = balance;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    @Override
-    public String toString() {
-        return "BalanceHistory{" +
-                "transactionDate=" + date +
-                ", balance=" + balance +
-                '}';
+    public HistoryBalance(LocalDateTime date, Double balance) {
     }
 }
