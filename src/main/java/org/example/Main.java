@@ -290,6 +290,50 @@ public class Main {
             logger.info( "Taux de change récupéré avec succès. Devise ID : {}, Date : {}, Taux : {}", currencyId, date, exchangeRate);
 
 
+            // Utilisez la même instance de connexion créée au début
+            CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations(connection);
+
+            // Tester la méthode findAll de CategoryCrudOperations
+            logger.info("Test de la méthode findAll de CategoryCrudOperations");
+
+            try {
+                List<Category> allCategories = categoryCrudOperations.findAll();
+                allCategories.forEach(category -> logger.info("Catégorie trouvée : {}", category));
+            } catch (Exception e) {
+                logger.error("Une erreur s'est produite lors du test de la méthode findAll : {}", e.getMessage());
+            }
+
+            // Tester la méthode saveAll
+            logger.info("Test de la méthode saveAll de CategoryCrudOperations");
+
+            // Créer la liste de catégories à sauvegarder
+            List<Category> categoriesToSave = new ArrayList<>();
+
+            Category category1 = new Category();
+            category1.setCategoryName("Voyage");
+            categoriesToSave.add(category1);
+
+            Category category2 = new Category();
+            category2.setCategoryName("Picnic");
+            categoriesToSave.add(category2);
+
+            // Appeler la méthode saveAll
+            List<Category> savedCategories = categoryCrudOperations.saveAll(categoriesToSave);
+
+            // Journaliser les catégories sauvegardées
+            savedCategories.forEach(saved -> logger.info("Catégorie sauvegardée : {}", saved));
+
+            // Tester la méthode save
+            logger.info("Test de la méthode save de CategoryCrudOperations");
+            Category newCategory = new Category();
+            newCategory.setCategoryName("Picnic");
+
+            Category savedCategory = categoryCrudOperations.save(newCategory);
+            logger.info("Catégorie sauvegardée : {}", savedCategory);
+
+            logger.info("Tests de CategoryCrudOperations terminés!");
+
+
 
         } catch (SQLException e) {
             e.printStackTrace();
