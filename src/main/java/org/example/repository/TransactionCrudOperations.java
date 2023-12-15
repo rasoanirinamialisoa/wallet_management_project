@@ -145,7 +145,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         String sql = "SELECT t.amount, c.name " +
                 "FROM Transaction t " +
                 "LEFT JOIN Category c ON t.categoryId = c.id " +
-                "WHERE t.accountId = ? AND t.date BETWEEN ? AND ?";
+                "WHERE t.accountId = ? AND t.dateOfTransaction BETWEEN ? AND ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, accountId);
@@ -222,6 +222,35 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
     }
 
     private static List<Transaction> findAllByAccountIdAndDateBetween(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    }
+
+public BigDecimal getEntriesAndExitsSumByIdAccount(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        BigDecimal totalEntries = BigDecimal.ZERO;
+        BigDecimal totalExits = BigDecimal.ZERO;
+
+        String sql = "SELECT t.amount, t.transactionType " +
+                "FROM \"transaction\" t " +
+                "WHERE t.accountId = ? AND t.dateOfTransaction BETWEEN ? AND ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, accountId);
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(startDate));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(endDate));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    BigDecimal amount = resultSet.getBigDecimal("amount");
+                    String transactionType = resultSet.getString("transactionsType");
+                    if ("credit".equals(transactionType)) {
+                        totalEntries = totalEntries.add(amount);
+                    } else if ("debit".equals(transactionType)) {
+                        totalExits = totalExits.add(amount);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return totalEntries.add(totalExits);
     }
 
 
