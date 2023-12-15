@@ -141,7 +141,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         String sql = "SELECT t.amount, c.name " +
                 "FROM Transaction t " +
                 "LEFT JOIN Category c ON t.categoryId = c.id " +
-                "WHERE t.accountId = ? AND t.date BETWEEN ? AND ?";
+                "WHERE t.accountId = ? AND t.dateOfTransaction BETWEEN ? AND ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, accountId);
