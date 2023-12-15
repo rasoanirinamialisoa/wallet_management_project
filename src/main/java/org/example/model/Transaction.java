@@ -15,5 +15,6 @@ public class Transaction {
     private double amount;
     private Timestamp dateOfTransaction;
     private String transactionsType;
+    private Category category;
 }
 
