@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS Transaction (
     amount DOUBLE PRECISION NOT NULL,
     dateOfTransaction TIMESTAMP NOT NULL,
     transactionsType VARCHAR(10) NOT NULL CHECK (transactionsType IN ('Debit', 'Credit')),
-    accountId INT REFERENCES Account(accountId)
+    accountId INT REFERENCES Account(accountId),
+    categoryId INT REFERENCES Categories(categoryId)
 );
 
 

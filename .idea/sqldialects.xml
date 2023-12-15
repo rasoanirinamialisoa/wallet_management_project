@@ -3,6 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_account.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_balance_history.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/create_table_categories.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_currency.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_currencyValue.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_transaction.sql" dialect="PostgreSQL" />
