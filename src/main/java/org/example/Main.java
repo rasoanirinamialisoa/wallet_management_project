@@ -314,7 +314,7 @@ public class Main {
             categoriesToSave.add(category1);
 
             Category category2 = new Category();
-            category2.setCategoryName("Picnic");
+            category2.setCategoryName("Etude");
             categoriesToSave.add(category2);
 
             // Appeler la méthode saveAll
@@ -326,7 +326,7 @@ public class Main {
             // Tester la méthode save
             logger.info("Test de la méthode save de CategoryCrudOperations");
             Category newCategory = new Category();
-            newCategory.setCategoryName("Picnic");
+            newCategory.setCategoryName("Paris sport");
 
             Category savedCategory = categoryCrudOperations.save(newCategory);
             logger.info("Catégorie sauvegardée : {}", savedCategory);

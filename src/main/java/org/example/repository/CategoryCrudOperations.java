@@ -38,11 +38,12 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
 
     @Override
     public List<Category> saveAll(List<Category> toSave) {
-        String query = "INSERT INTO categories (categoryName) VALUES (?)";
+        String query = "INSERT INTO categories (categoryName) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE categoryName = ?)";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 for (Category category : toSave) {
                     preparedStatement.setString(1, category.getCategoryName());
+                    preparedStatement.setString(2, category.getCategoryName());
                     preparedStatement.addBatch();
                 }
                 preparedStatement.executeBatch();
@@ -55,10 +56,11 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
 
     @Override
     public Category save(Category toSave) {
-        String query = "INSERT INTO categories (categoryName) VALUES (?) RETURNING *";
+        String query = "INSERT INTO categories (categoryName) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE categoryName = ?) RETURNING *";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, toSave.getCategoryName());
+                preparedStatement.setString(2, toSave.getCategoryName());
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         return mapResultSetToCategory(resultSet);
