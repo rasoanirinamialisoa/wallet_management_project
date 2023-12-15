@@ -1,10 +1,10 @@
 package org.example.repository;
+import org.example.model.BalanceSumsResult;
 import org.example.model.Category;
+import org.example.model.CategorySumsResult;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +72,65 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
         }
         return null;
     }
+
+    public CategorySumsResult getCategorySumsBetweenDates(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        CallableStatement callableStatement = null;
+
+        try {
+            String sql = "{ ? = call getCategorySumsBetweenDates(?, ?, ?) }";
+            callableStatement = connection.prepareCall(sql);
+
+            // Register the return type (OUT) for the first variable
+            callableStatement.registerOutParameter(1, Types.OTHER);
+
+            // Input parameters
+            callableStatement.setInt(2, accountId);
+            callableStatement.setTimestamp(3, Timestamp.valueOf(startDate));
+            callableStatement.setTimestamp(4, Timestamp.valueOf(endDate));
+
+            // Execute the stored procedure
+            callableStatement.execute();
+
+            // Retrieve the result of the stored procedure
+            Object result = callableStatement.getObject(1);
+
+            CategorySumsResult categorySumsResult = new CategorySumsResult();
+
+            if (result instanceof ResultSet) {
+                ResultSet resultSet = (ResultSet) result;
+                while (resultSet.next()) {
+                    // Assuming the columns are named 'restaurant' and 'salaire'
+                    double restaurantSum = resultSet.getDouble("restaurant");
+                    double salaireSum = resultSet.getDouble("salaire");
+
+                    // Set the values in the CategorySumsResult object
+                    categorySumsResult.setRestaurantSum(restaurantSum);
+                    categorySumsResult.setSalaireSum(salaireSum);
+                }
+            }
+
+            return categorySumsResult;
+        } catch (SQLException e) {
+            // Handle the exception
+            e.printStackTrace();
+            throw new RuntimeException("Error executing stored procedure", e);
+        } finally {
+            // Close resources
+            try {
+                if (callableStatement != null) {
+                    callableStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // Handle the exception
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 
 
     private static Category mapResultSetToCategory(ResultSet resultSet) throws SQLException {

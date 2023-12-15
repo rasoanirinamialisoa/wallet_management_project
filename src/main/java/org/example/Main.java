@@ -136,9 +136,7 @@ public class Main {
             Transaction savedTransaction = transactionCrudOperations.save(newTransaction);
             logger.info("Transaction sauvegardée : {}", savedTransaction);
 
-            BalanceSumsResult balanceSumsResult = transactionCrudOperations.getBalanceSumBetweenDates(
-                    22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
-
+            BalanceSumsResult balanceSumsResult = transactionCrudOperations.getBalanceSumBetweenDates(22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
             // Affichez les résultats dans les logs
             logger.info("Total Income: {}", balanceSumsResult.getTotalIncome());
             logger.info("Total Expense: {}", balanceSumsResult.getTotalExpense());
@@ -148,7 +146,7 @@ public class Main {
             // Utilisez la même instance de connexion créée au début
             CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations(connection);
 
-// Tester la méthode findAll de CurrencyCrudOperations
+            // Tester la méthode findAll de CurrencyCrudOperations
             logger.info("Test de la méthode findAll de CurrencyCrudOperations");
 
             try {
@@ -339,6 +337,11 @@ public class Main {
 
             Category savedCategory = categoryCrudOperations.save(newCategory);
             logger.info("Catégorie sauvegardée : {}", savedCategory);
+
+            CategorySumsResult categorySumsResult = categoryCrudOperations.getCategorySumsBetweenDates(22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
+            // Affichez les résultats dans les logs
+            logger.info("Total Income: {}", categorySumsResult.getRestaurant());
+            logger.info("Total Expense: {}", categorySumsResult.getSalaire());
 
             logger.info("Tests de CategoryCrudOperations terminés!");
 

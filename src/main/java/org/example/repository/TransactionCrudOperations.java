@@ -108,10 +108,10 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
                 Struct structResult = (Struct) result;
                 Object[] attributes = structResult.getAttributes();
 
-                // Supposons que la première valeur est total_income et la deuxième est total_expense
                 balanceSumsResult.setTotalIncome((Double) attributes[0]);
                 balanceSumsResult.setTotalExpense((Double) attributes[1]);
             }
+
 
             return balanceSumsResult;
         } catch (SQLException e) {
