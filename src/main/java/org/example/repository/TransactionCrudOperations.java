@@ -2,8 +2,12 @@ package org.example.repository;
 
 
 import org.example.model.BalanceSumsResult;
+import org.example.model.Category;
 import org.example.model.Transaction;
+import org.example.repository.CategoryCrudOperations;
 
+
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -168,6 +172,57 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         return restaurantSum.add(salarySum);
     }
 
+    public BalanceSumsResult getBalanceSumBetweenDatesWithoutStoredProcedure(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        try {
+            // Récupérer toutes les transactions entre les dates spécifiées
+            
+            List<Transaction> transactions = TransactionCrudOperations.findAllByAccountIdAndDateBetween(accountId, startDate, endDate);
+
+            // Récupérer toutes les catégories
+            List<Category> categories = CategoryCrudOperations.findAll();
+
+            // Initialiser les sommes
+            double totalIncome = 0.0;
+            double totalExpense = 0.0;
+
+            // Parcourir les transactions pour calculer les sommes
+            for (Transaction transaction : transactions) {
+                double amount = transaction.getAmount();
+
+                if (amount > 0) {
+                    totalIncome += amount;
+                } else {
+                    totalExpense += amount;
+                }
+            }
+
+            // Mapper les catégories avec les transactions pour obtenir les sommes par catégorie
+            Map<String, Double> categorySums = new HashMap<>();
+            for (Category category : categories) {
+                double categorySum = transactions.stream()
+                        .filter(t -> t.getCategoryId() == category.getCategoryId())
+                        .mapToDouble(Transaction::getAmount)
+                        .sum();
+
+                categorySums.put(category.getCategoryName(), categorySum);
+            }
+
+            // Créer et retourner l'objet BalanceSumsResult
+            BalanceSumsResult balanceSumsResult = new BalanceSumsResult();
+            balanceSumsResult.setTotalIncome(totalIncome);
+            balanceSumsResult.setTotalExpense(totalExpense);
+            balanceSumsResult.setCategorySums(categorySums);
+
+            return balanceSumsResult;
+        } catch (Exception e) {
+            // Gérer l'exception
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving balance sums", e);
+        }
+    }
+
+    private static List<Transaction> findAllByAccountIdAndDateBetween(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    }
 
 
     private Transaction mapResultSetToTransaction(ResultSet resultSet) throws SQLException {

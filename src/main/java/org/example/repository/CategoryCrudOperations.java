@@ -17,7 +17,7 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
     }
 
     @Override
-    public List<Category> findAll() {
+    public static List<Category> findAll() {
         List<Category> categories = new ArrayList<>();
         try {
             String query = "SELECT * FROM categories";
