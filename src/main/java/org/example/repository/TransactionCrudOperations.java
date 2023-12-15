@@ -1,9 +1,11 @@
 package org.example.repository;
 
 
+import org.example.model.BalanceSumsResult;
 import org.example.model.Transaction;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +78,62 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         }
         return null;
     }
+
+
+    public BalanceSumsResult getBalanceSumBetweenDates(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        CallableStatement callableStatement = null;
+
+        try {
+            String sql = "{ ? = call getBalanceSumBetweenDates(?, ?, ?) }";
+            callableStatement = connection.prepareCall(sql);
+
+            // Enregistrez le type de retour (OUT) pour la première variable
+            callableStatement.registerOutParameter(1, Types.OTHER);
+
+            // Paramètres d'entrée
+            callableStatement.setInt(2, accountId);
+            callableStatement.setTimestamp(3, Timestamp.valueOf(startDate));
+            callableStatement.setTimestamp(4, Timestamp.valueOf(endDate));
+
+            // Exécutez la procédure stockée
+            callableStatement.execute();
+
+            // Récupérez le résultat de la procédure stockée
+            Object result = callableStatement.getObject(1);
+
+            // Mapper le résultat dans votre objet BalanceSumsResult
+            BalanceSumsResult balanceSumsResult = new BalanceSumsResult();
+
+            if (result instanceof Struct) {
+                Struct structResult = (Struct) result;
+                Object[] attributes = structResult.getAttributes();
+
+                // Supposons que la première valeur est total_income et la deuxième est total_expense
+                balanceSumsResult.setTotalIncome((Double) attributes[0]);
+                balanceSumsResult.setTotalExpense((Double) attributes[1]);
+            }
+
+            return balanceSumsResult;
+        } catch (SQLException e) {
+            // Gérer l'exception
+            e.printStackTrace();
+            throw new RuntimeException("Error executing stored procedure", e);
+        } finally {
+            // Fermez les ressources
+            try {
+                if (callableStatement != null) {
+                    callableStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // Gérer l'exception
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 
     private Transaction mapResultSetToTransaction(ResultSet resultSet) throws SQLException {

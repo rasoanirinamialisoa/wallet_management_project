@@ -136,6 +136,13 @@ public class Main {
             Transaction savedTransaction = transactionCrudOperations.save(newTransaction);
             logger.info("Transaction sauvegardée : {}", savedTransaction);
 
+            BalanceSumsResult balanceSumsResult = transactionCrudOperations.getBalanceSumBetweenDates(
+                    22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
+
+            // Affichez les résultats dans les logs
+            logger.info("Total Income: {}", balanceSumsResult.getTotalIncome());
+            logger.info("Total Expense: {}", balanceSumsResult.getTotalExpense());
+
             logger.info("Tests de TransactionCrudOperations terminés!");
 
             // Utilisez la même instance de connexion créée au début
