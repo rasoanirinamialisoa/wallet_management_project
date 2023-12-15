@@ -10,3 +10,6 @@ BEGIN
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
+DROP FUNCTION IF EXISTS getBalanceSumBetweenDates(INT, TIMESTAMP, TIMESTAMP);
+
+SELECT * FROM getBalanceSumBetweenDates(1, '2023-01-01', '2023-12-31');
