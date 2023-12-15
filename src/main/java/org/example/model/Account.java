@@ -23,5 +23,8 @@ public class Account {
     public static final String ACCOUNT_TYPE = "accountType";
     public void setAccountid(int accountid) {
     }
+
+    public void setAccountId(int accountId) {
+    }
 }
 

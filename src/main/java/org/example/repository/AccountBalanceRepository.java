@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import org.example.model.Account;
 import org.example.model.TransferHistoryEntry;
 
 import java.math.BigDecimal;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountBalanceRepository {
-    private static Connection connection;
+    private Connection connection; // Ne pas déclarer comme statique
 
     public AccountBalanceRepository(Connection connection) {
         this.connection = connection;
@@ -39,18 +40,20 @@ public class AccountBalanceRepository {
             connection.commit();
         } catch (SQLException e) {
             // Gérer l'exception
+            e.printStackTrace(); // Ajout d'une trace pour la gestion des erreurs
         } finally {
             try {
                 connection.setAutoCommit(true);
             } catch (SQLException e) {
                 // Gérer l'exception
+                e.printStackTrace(); // Ajout d'une trace pour la gestion des erreurs
             }
         }
 
         return currentBalance;
     }
 
-    public static List<TransferHistoryEntry> findAll(int accountId) {
+    public List<TransferHistoryEntry> findAll(int accountId) {
         List<TransferHistoryEntry> transferHistories = new ArrayList<>();
         String query = "SELECT debitTransactionId, creditTransactionId, transferAmount, transferDate FROM TransferHistoryEntry WHERE debitTransactionId = ? OR creditTransactionId = ?";
 
@@ -63,7 +66,7 @@ public class AccountBalanceRepository {
                     int debitTransactionId = resultSet.getInt("debitTransactionId");
                     int creditTransactionId = resultSet.getInt("creditTransactionId");
                     double transferAmount = resultSet.getDouble("transferAmount");
-                    Timestamp transferDate = Timestamp.valueOf(resultSet.getTimestamp("transferDate").toLocalDateTime());
+                    Timestamp transferDate = resultSet.getTimestamp("transferDate");
 
                     TransferHistoryEntry entry = new TransferHistoryEntry(debitTransactionId, creditTransactionId, transferAmount, transferDate);
                     transferHistories.add(entry);
@@ -86,10 +89,10 @@ public class AccountBalanceRepository {
             double amountInAriary = amount * exchangeRate;
 
             // Mettre à jour le solde du compte débiteur (en euros)
-            updateAccountBalance(debitAccountId, -amount);
+            save(debitAccountId, -amount);
 
             // Mettre à jour le solde du compte créditeur (en Ariary)
-            updateAccountBalance(creditAccountId, amountInAriary);
+            save(creditAccountId, amountInAriary);
 
             // Enregistrez les détails du transfert dans la table TransferHistory
             saveTransferHistory(debitAccountId, creditAccountId, amountInAriary, transferDate.toLocalDateTime());
@@ -99,36 +102,56 @@ public class AccountBalanceRepository {
         }
     }
 
-    private void updateAccountBalance(int accountId, double amount) throws SQLException {
-        String sql = "UPDATE Account SET balance = balance + ? WHERE accountId = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setDouble(1, amount);
+
+    public Account save(int accountId, double balance) throws SQLException {
+        String query = "UPDATE Account SET balance = balance + ? WHERE accountId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setDouble(1, balance);
             preparedStatement.setInt(2, accountId);
             preparedStatement.executeUpdate();
+
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                // Obtenez l'ID généré si nécessaire
+                int generatedAccountId = generatedKeys.getInt(1);
+
+                // Construisez et retournez l'objet Account mis à jour
+                Account updatedAccount = new Account();
+                updatedAccount.setAccountId(generatedAccountId);
+                updatedAccount.setBalance(balance);
+                return updatedAccount;
+            } else {
+                // Si vous n'avez pas besoin de l'ID généré, retournez simplement un nouvel objet Account avec les valeurs mises à jour
+                Account updatedAccount = new Account();
+                updatedAccount.setAccountId(accountId);
+                updatedAccount.setBalance(balance);
+                return updatedAccount;
+            }
         }
     }
 
-    private void saveTransferHistory(int debitAccountId, int creditAccountId, double amount, LocalDateTime transferDate) throws SQLException {
-        String sql = "INSERT INTO TransferHistoryEntry (debit_account_id, credit_account_id, transfer_amount, transfer_date) VALUES (?, ?, ?, ?)";
+
+    public void saveTransferHistory(int debitTransactionId, int creditTransactionId, double transferAmount, LocalDateTime transferDate) throws SQLException {
+        String sql = "INSERT INTO TransferHistoryEntry (debitTransactionId, creditTransactionId, transferAmount, transferDate) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, debitAccountId);
-            preparedStatement.setInt(2, creditAccountId);
-            preparedStatement.setDouble(3, amount);
+            preparedStatement.setInt(1, debitTransactionId);
+            preparedStatement.setInt(2, creditTransactionId);
+            preparedStatement.setDouble(3, transferAmount);
             preparedStatement.setObject(4, transferDate);
             preparedStatement.executeUpdate();
         }
     }
 
-    private double getExchangeRate(LocalDateTime date, int currencyId) {
-        String sql = "SELECT value FROM CurrencyValue WHERE id_devise_source = ? AND date_effet <= ? ORDER BY date_effet DESC LIMIT 1";
+    public double getExchangeRate(LocalDateTime date, int currencyId) {
+        String sql = "SELECT montant FROM CurrencyValue WHERE id_devise_source = ? AND date_effet <= ? ORDER BY date_effet DESC LIMIT 1";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, currencyId);
-            preparedStatement.setObject(2, date);
+            preparedStatement.setObject(2, Timestamp.valueOf(date));
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    double exchangeRate = resultSet.getDouble("value");
+                    double exchangeRate = resultSet.getDouble("montant");
                     return exchangeRate != 0.0 ? exchangeRate : 1.0;
                 }
             }
@@ -137,5 +160,6 @@ public class AccountBalanceRepository {
         }
         return 1.0;
     }
+
 
 }

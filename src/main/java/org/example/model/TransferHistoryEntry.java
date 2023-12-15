@@ -20,4 +20,5 @@ public class TransferHistoryEntry {
     public TransferHistoryEntry(int debitTransactionId, int creditTransactionId, double transferAmount, Timestamp transferDate) {
     }
 
+
 }

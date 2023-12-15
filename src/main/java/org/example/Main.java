@@ -6,6 +6,7 @@ import org.example.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -243,7 +244,48 @@ public class Main {
                 logger.error("Une erreur s'est produite lors du test de la méthode findAll de AccountBalanceRepository : {}", e.getMessage());
             }
 
+            // Test de la méthode save de AccountBalanceRepository
+            logger.info("Test de la méthode save de AccountBalanceRepository");
 
+            try {
+                int accountId = 8;
+                double balanceToAdd = 3000000.0;
+
+                Account updatedAccount = accountBalanceRepository.save(accountId, balanceToAdd);
+
+                if (updatedAccount != null) {
+                    logger.info("Solde du compte mis à jour. Compte ID : {}, Montant ajouté : {}", updatedAccount.getAccountId(), balanceToAdd);
+                } else {
+                    logger.warn("Aucune mise à jour effectuée. Compte ID : {}, Montant ajouté : {}", accountId, balanceToAdd);
+                }
+            } catch (SQLException e) {
+                logger.error("Erreur lors de la mise à jour du solde du compte : {}", e.getMessage());
+            }
+
+            // tester la méthode saveTransferHistory
+            logger.info("Test de la méthode saveTransferHistory de AccountBalanceRepository");
+            try {
+                int debitAccountId = 1;
+                int creditAccountId = 2;
+                double amount = 100.0;
+                LocalDateTime transferDate = LocalDateTime.now();
+
+                accountBalanceRepository.saveTransferHistory(debitAccountId, creditAccountId, amount, transferDate);
+
+                logger.info("Historique de transfert enregistré avec succès. Debit Account ID : {}, Credit Account ID : {}, Montant : {}, Date de transfert : {}", debitAccountId, creditAccountId, amount, transferDate);
+            } catch (SQLException e) {
+                logger.error("Erreur lors de l'enregistrement de l'historique de transfert : {}", e.getMessage());
+            }
+
+            // Test de la méthode getExchangeRate de AccountBalanceRepository
+            logger.info("Test de la méthode getExchangeRate de AccountBalanceRepository");
+
+            int currencyId = 1;
+            LocalDateTime date = LocalDateTime.now();
+
+            double exchangeRate = accountBalanceRepository.getExchangeRate(date, currencyId);
+
+            logger.info("Taux de change récupéré avec succès. Devise ID : {}, Date : {}, Taux : {}", currencyId, date, exchangeRate);
 
 
         } catch (SQLException e) {
