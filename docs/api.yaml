@@ -5,5 +5,544 @@ info:
   description: STD22026_STD22020
 servers:
   - url: https://wallet.com
-
+tags:
+  - name: Accounts
+    description: Operations related to accounts
+  - name: Transactions
+    description: Operations related to transactions
+  - name: Currencies
+    description: Operations related to currencies
+  - name: FinancialOperations
+    description: Operations related to financial operations
 paths:
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve the list of accounts
+      description: The returne account all ordered
+      operationId: getAccount
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    post:
+      summary: Add a new account
+      tags:
+        - Accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /accounts/{accountId}:
+    get:
+      tags:
+        - Accounts
+      summary: Retrieve details of an account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    put:
+      tags:
+        - Accounts
+      summary: Modify an existing account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          $ref: "#/components/responses/AccountList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+  /transactions:
+    get:
+      summary: Retrieve the list of transactions
+      tags:
+        - Transactions
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    post:
+      summary: Add a new transaction
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+          200:
+            $ref: "#/components/responses/TransactionList_200"
+          400:
+            $ref: "#/components/responses/BadRequest_400"
+          403:
+            $ref: "#/components/responses/ForbiddenRequest_403"
+          500:
+            $ref: "#/components/responses/ErrorRequest_500"
+
+  /transactions/{transactionId}:
+    get:
+      summary: Retrieve details of a transaction
+      tags:
+        - Transactions
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    put:
+      summary: Modify an existing transaction
+      tags:
+        - Transactions
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /accounts/{accountId}/transactions:
+
+    get:
+      summary: Retrieve transactions of a specific account
+      tags:
+        - FinancialOperations
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          description: Start date for filtering transactions
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date for filtering transactions
+          schema:
+            type: string
+            format: date
+        - name: category
+          in: query
+          description: Transaction category for filtering
+          schema:
+            type: string
+        - name: minAmount
+          in: query
+          description: Minimum transaction amount for filtering
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          description: Maximum transaction amount for filtering
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    post:
+      summary: Add a new transaction to an account
+      tags:
+        - FinancialOperations
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        200:
+          $ref: "#/components/responses/TransactionList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /currencies:
+    get:
+      summary: Retrieve the list of currencies
+      tags:
+        - Currencies
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    post:
+      summary: Add a new currency
+      tags:
+        - Currencies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /currencies/{currencyId}:
+    get:
+      summary: Retrieve details of a currency
+      tags:
+        - Currencies
+      parameters:
+        - name: currencyId
+          in: path
+          required: true
+          description: Currency ID
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+    put:
+      summary: Modify an existing currency
+      tags:
+        - Currencies
+      parameters:
+        - name: currencyId
+          in: path
+          required: true
+          description: Currency ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+  /accounts/{accountId}/currency:
+    get:
+      summary: Retrieve the currency of an account
+      tags:
+        - FinancialOperations
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+    put:
+      summary: Update the currency of an account
+      tags:
+        - FinancialOperations
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: "#/components/responses/CurrencyList_200"
+        400:
+          $ref: "#/components/responses/BadRequest_400"
+        403:
+          $ref: "#/components/responses/ForbiddenRequest_403"
+        500:
+          $ref: "#/components/responses/ErrorRequest_500"
+
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: current account
+        balance:
+          type: integer
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        currency:
+          type: array
+          items:
+            $ref: "#/components/schemas/Currency"
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        amount:
+          type: number
+        dateOfTransaction:
+          type: string
+          format: date
+        transactionsType:
+          enum:
+            - Withdraw
+            - Deposit
+          type: string
+
+    Currency:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+
+
+    ResponseStatus:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: OK
+    ResponseBodyTemplate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatus'
+        body:
+          type: object
+
+    BadRequestBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 400
+          message: BAD REQUEST
+        body: { }
+
+
+    ForbiddenRequest:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 403
+          message: FORBIDDEN
+        body: { }
+
+    ServerErrorRequest:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 500
+          message: Internal servor error
+        body: { }
+    AccountListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Account'
+    TransactionListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+    CurrencyListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Currency'
+
+  responses:
+    AccountList_200:
+      description: List of accounts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountListBody'
+    TransactionList_200:
+      description: List of transactions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransactionListBody'
+    CurrencyList_200:
+      description: List of currencies
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CurrencyListBody'
+
+    BadRequest_400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestBody'
+    ForbiddenRequest_403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenRequest'
+    ErrorRequest_500:
+      description: Error request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServerErrorRequest'
