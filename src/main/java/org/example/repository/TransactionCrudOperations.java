@@ -35,7 +35,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
     @Override
     public List<Transaction> saveAll(List<Transaction> toSave) {
-        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType, categoryId) VALUES (?, ?, ?, ?, ?)";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 for (Transaction transaction : toSave) {
@@ -56,7 +56,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
     @Override
     public Transaction save(Transaction toSave) {
-        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType) VALUES (?, ?, ?, ?, ?) RETURNING *";
+        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType, categoryId) VALUES (?, ?, ?, ?, ?) RETURNING *";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setInt(1, toSave.getAccountId());
@@ -86,6 +86,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         transaction.setAmount(resultSet.getDouble("amount"));
         transaction.setDateOfTransaction(resultSet.getTimestamp("dateOfTransaction"));
         transaction.setTransactionsType(resultSet.getString("transactionsType"));
+        transaction.setCategoryId(resultSet.getInt("categoryId"));
         return transaction;
     }
 }

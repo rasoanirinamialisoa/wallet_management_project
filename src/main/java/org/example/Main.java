@@ -114,6 +114,7 @@ public class Main {
             transaction2.setAmount(200000.0);
             transaction2.setDateOfTransaction(Timestamp.valueOf(LocalDateTime.now()));
             transaction2.setTransactionsType("Credit");
+            transaction2.setCategoryId(7);
             transactionsToSave.add(transaction2);
 
 // Appeler la méthode saveAll
@@ -130,6 +131,7 @@ public class Main {
             newTransaction.setAmount(100000.0);
             newTransaction.setDateOfTransaction(Timestamp.valueOf(LocalDateTime.now()));
             newTransaction.setTransactionsType("Debit");
+            newTransaction.setCategoryId(2);
 
             Transaction savedTransaction = transactionCrudOperations.save(newTransaction);
             logger.info("Transaction sauvegardée : {}", savedTransaction);

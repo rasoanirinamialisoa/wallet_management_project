@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/src/main/resources/create_fucntion_getCategorySumsBetweenDates.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/create_function_getBalanceBetweenDates.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_account.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_balance_history.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/create_table_categories.sql" dialect="PostgreSQL" />
