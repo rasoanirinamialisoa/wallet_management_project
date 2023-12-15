@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    public static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         ConnectDatabase connectDatabase = new ConnectDatabase();
@@ -277,15 +277,18 @@ public class Main {
                 logger.error("Erreur lors de l'enregistrement de l'historique de transfert : {}", e.getMessage());
             }
 
-            // Test de la méthode getExchangeRate de AccountBalanceRepository
-            logger.info("Test de la méthode getExchangeRate de AccountBalanceRepository");
+            // Test de la méthode getExchangeRate de AccountExchangeRate
+            AccountExchangeRate accountExchangeRate = new AccountExchangeRate(connection);
+            logger.info("Test de la méthode getExchangeRate de AccounteExchangeRate");
 
-            int currencyId = 1;
+            int currencyId = 6;
             LocalDateTime date = LocalDateTime.now();
+            AccountExchangeRate.ExchangeRateCalculationType calculationType = AccountExchangeRate.ExchangeRateCalculationType.WEIGHTED_AVERAGE;
 
-            double exchangeRate = accountBalanceRepository.getExchangeRate(date, currencyId);
+            double exchangeRate = accountExchangeRate.getExchangeRate(date, currencyId, calculationType);
 
-            logger.info("Taux de change récupéré avec succès. Devise ID : {}, Date : {}, Taux : {}", currencyId, date, exchangeRate);
+            logger.info( "Taux de change récupéré avec succès. Devise ID : {}, Date : {}, Taux : {}", currencyId, date, exchangeRate);
+
 
 
         } catch (SQLException e) {

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountBalanceRepository {
-    private Connection connection; // Ne pas déclarer comme statique
+    private Connection connection;
 
     public AccountBalanceRepository(Connection connection) {
         this.connection = connection;
