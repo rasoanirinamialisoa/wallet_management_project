@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.model.HistoryBalance;
+import org.example.model.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,6 +43,14 @@ public class HistoryCrudOperation {
         }
 
         return balanceHistories;
+    }
+
+    private HistoryBalance mapResultSetToHistoryBalance(ResultSet resultSet) throws SQLException {
+        HistoryBalance historyBalance = new HistoryBalance();
+        historyBalance.setHistoryId(resultSet.getInt(historyBalance.HISTORY_ID));
+        historyBalance.setBalance(resultSet.getDouble(historyBalance.BALANCE_HISTORY));
+        historyBalance.setDate(resultSet.getTimestamp(historyBalance.DATE_HISTORY_BALANCE));
+        return historyBalance;
     }
 
 }

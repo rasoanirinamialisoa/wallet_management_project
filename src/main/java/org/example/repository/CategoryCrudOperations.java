@@ -17,7 +17,7 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
     }
 
     @Override
-    public static List<Category> findAll() {
+    public List<Category> findAll() {
         List<Category> categories = new ArrayList<>();
         try {
             String query = "SELECT * FROM categories";
@@ -33,6 +33,7 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
         }
         return categories;
     }
+
 
 
 
@@ -129,8 +130,6 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
             }
         }
     }
-
-
 
 
     private static Category mapResultSetToCategory(ResultSet resultSet) throws SQLException {

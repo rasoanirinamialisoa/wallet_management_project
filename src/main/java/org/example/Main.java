@@ -5,8 +5,9 @@ import org.example.model.*;
 import org.example.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -106,6 +107,7 @@ public class Main {
             transaction1.setAmount(50.0);
             transaction1.setDateOfTransaction(Timestamp.valueOf(LocalDateTime.now()));
             transaction1.setTransactionsType("Debit");
+            transaction1.setCategoryId(5);
             transactionsToSave.add(transaction1);
 
             Transaction transaction2 = new Transaction();
@@ -114,7 +116,7 @@ public class Main {
             transaction2.setAmount(200000.0);
             transaction2.setDateOfTransaction(Timestamp.valueOf(LocalDateTime.now()));
             transaction2.setTransactionsType("Credit");
-            transaction2.setCategoryId(7);
+            transaction2.setCategoryId(11);
             transactionsToSave.add(transaction2);
 
 // Appeler la méthode saveAll
@@ -136,12 +138,6 @@ public class Main {
             Transaction savedTransaction = transactionCrudOperations.save(newTransaction);
             logger.info("Transaction sauvegardée : {}", savedTransaction);
 
-            BalanceSumsResult balanceSumsResult = transactionCrudOperations.getBalanceSumBetweenDates(22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
-            // Affichez les résultats dans les logs
-            logger.info("Total Income: {}", balanceSumsResult.getTotalIncome());
-            logger.info("Total Expense: {}", balanceSumsResult.getTotalExpense());
-
-            logger.info("Tests de TransactionCrudOperations terminés!");
 
             // Utilisez la même instance de connexion créée au début
             CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations(connection);
@@ -221,7 +217,6 @@ public class Main {
 
                 List<HistoryBalance> allBalanceHistory = HistoryCrudOperation.findAll(accountId, startDate, endDate);
 
-
                 if (!allBalanceHistory.isEmpty()) {
                     for (HistoryBalance entry : allBalanceHistory) {
                         logger.info("Historique de solde trouvé : {}", entry);
@@ -288,14 +283,13 @@ public class Main {
             AccountExchangeRate accountExchangeRate = new AccountExchangeRate(connection);
             logger.info("Test de la méthode getExchangeRate de AccounteExchangeRate");
 
-            int currencyId = 6;
+            int id_devise_source = 1;
             LocalDateTime date = LocalDateTime.now();
             AccountExchangeRate.ExchangeRateCalculationType calculationType = AccountExchangeRate.ExchangeRateCalculationType.WEIGHTED_AVERAGE;
 
-            double exchangeRate = accountExchangeRate.getExchangeRate(date, currencyId, calculationType);
+            double exchangeRate = accountExchangeRate.getExchangeRate(date, id_devise_source, calculationType);
 
-            logger.info( "Taux de change récupéré avec succès. Devise ID : {}, Date : {}, Taux : {}", currencyId, date, exchangeRate);
-
+            logger.info( "Taux de change récupéré avec succès. Devise ID : {}, Date : {}, Taux : {}", id_devise_source, date, exchangeRate);
 
             // Utilisez la même instance de connexion créée au début
             CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations(connection);
@@ -330,7 +324,7 @@ public class Main {
             // Journaliser les catégories sauvegardées
             savedCategories.forEach(saved -> logger.info("Catégorie sauvegardée : {}", saved));
 
-            // Tester la méthode save
+            // Tester la méthode save de CategoryCrudOperations
             logger.info("Test de la méthode save de CategoryCrudOperations");
             Category newCategory = new Category();
             newCategory.setCategoryName("Paris sport");
@@ -338,12 +332,55 @@ public class Main {
             Category savedCategory = categoryCrudOperations.save(newCategory);
             logger.info("Catégorie sauvegardée : {}", savedCategory);
 
-            CategorySumsResult categorySumsResult = categoryCrudOperations.getCategorySumsBetweenDates(22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
-            // Affichez les résultats dans les logs
-            logger.info("Total Income: {}", categorySumsResult.getRestaurant());
-            logger.info("Total Expense: {}", categorySumsResult.getSalaire());
+            // Tester la méthode save de CategoryCrudOperations
+            logger.info("Tester la méthode getEntriesAndExitsSumByIdAccount");
+            try {
+                int accountId = 8;  // Replace with the actual account ID
+                LocalDateTime startDate = LocalDateTime.parse("2023-01-01T00:00:00");
+                LocalDateTime endDate = LocalDateTime.parse("2023-12-31T23:59:59");
 
+                BigDecimal entriesAndExitsSum = transactionCrudOperations.getEntriesAndExitsSumByIdAccount(accountId, startDate, endDate);
+                logger.info("Entries and Exits Sum for Account {}: {}", accountId, entriesAndExitsSum);
+            } catch (Exception e) {
+                logger.error("Error testing getEntriesAndExitsSumByIdAccount method: {}", e.getMessage());
+            }
+
+            // Tester la méthode getCategorySumByIdAccount
+            logger.info("Tester la méthode getCategorySumByIdAccount");
+            try {
+                String accountId = "45"; // Replace with the actual account ID
+                LocalDateTime startDate = LocalDateTime.parse("2023-01-01T00:00:00");
+                LocalDateTime endDate = LocalDateTime.parse("2023-12-31T23:59:59");
+
+
+                BigDecimal categorySum = transactionCrudOperations.getCategorySumByIdAccount(accountId, startDate, endDate);
+                logger.info("Category Sum for Account {}: {}", accountId, categorySum);
+            } catch (Exception e) {
+                logger.error("Error testing getCategorySumByIdAccount method: {}", e.getMessage());
+            }
+
+            try {
+                CategorySumsResult categorySumsResult = categoryCrudOperations.getCategorySumsBetweenDates(22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
+                // Affichez les résultats dans les logs
+                logger.info("Total Income: {}", categorySumsResult.getRestaurantSum());
+                logger.info("Total Expense: {}", categorySumsResult.getSalaireSum());
+            }catch (Exception e){
+                logger.error("Error testing getCategorySumsBetweenDates method: {}", e.getMessage());
+            }
             logger.info("Tests de CategoryCrudOperations terminés!");
+
+            try {
+                BalanceSumsResult balanceSumsResult = transactionCrudOperations.getBalanceSumsBetweenDates(22, LocalDateTime.parse("2023-01-01T00:00:00"), LocalDateTime.parse("2023-12-31T23:59:59"));
+                // Affichez les résultats dans les logs
+                logger.info("Total Income: {}", balanceSumsResult.getTotalIncome());
+                logger.info("Total Expense: {}", balanceSumsResult.getTotalExpense());
+
+            } catch (Exception e) {
+                logger.error("Error testing getBalanceSumsBetweenDates ", e.getMessage());
+            }
+
+            logger.info("Tests de TransactionCrudOperations terminés!");
+
 
 
 

@@ -15,6 +15,9 @@ public class HistoryBalance {
     private Timestamp date;
     private double balance;
 
+    public static final String HISTORY_ID = "historyId";
+    public static final String DATE_HISTORY_BALANCE = "date";
+    public static final String BALANCE_HISTORY = "balance";
     public HistoryBalance(LocalDateTime date, Double balance) {
     }
 }

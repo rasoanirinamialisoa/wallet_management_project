@@ -3,6 +3,8 @@ package org.example.model;
 
 import lombok.*;
 
+import java.util.Map;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -20,6 +22,9 @@ public class CategorySumsResult {
 
     public void setSalaireSum(double salaireSum) {
         this.salaireSum = salaireSum;
+    }
+
+    public void setCategorySums(Map<String, Double> categorySums) {
     }
 }
 

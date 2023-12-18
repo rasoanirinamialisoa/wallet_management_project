@@ -14,4 +14,4 @@ END;
 $$ LANGUAGE plpgsql;
 DROP FUNCTION IF EXISTS getCategorySumsBetweenDates(INT, TIMESTAMP, TIMESTAMP);
 
-SELECT * FROM getCategorySumsBetweenDates(1, '2023-01-01', '2023-12-31');
+SELECT * FROM getcategorysumsbetweendates(1, '2023-01-01', '2023-12-31');

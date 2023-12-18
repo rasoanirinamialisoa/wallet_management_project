@@ -2,16 +2,15 @@ package org.example.repository;
 
 
 import org.example.model.BalanceSumsResult;
-import org.example.model.Category;
 import org.example.model.Transaction;
-import org.example.repository.CategoryCrudOperations;
-
 
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
@@ -41,7 +40,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
     @Override
     public List<Transaction> saveAll(List<Transaction> toSave) {
-        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType, categoryId) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType, categoryId) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 for (Transaction transaction : toSave) {
@@ -50,6 +49,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
                     preparedStatement.setDouble(3, transaction.getAmount());
                     preparedStatement.setTimestamp(4, transaction.getDateOfTransaction());
                     preparedStatement.setString(5, transaction.getTransactionsType());
+                    preparedStatement.setInt(6, transaction.getCategoryId());
                     preparedStatement.addBatch();
                 }
                 preparedStatement.executeBatch();
@@ -62,7 +62,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
 
     @Override
     public Transaction save(Transaction toSave) {
-        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType, categoryId) VALUES (?, ?, ?, ?, ?) RETURNING *";
+        String query = "INSERT INTO transaction (accountId, labelTransaction, amount, dateOfTransaction, transactionsType, categoryId) VALUES (?, ?, ?, ?, ?, ?) RETURNING *";
         try {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setInt(1, toSave.getAccountId());
@@ -70,7 +70,7 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
                 preparedStatement.setDouble(3, toSave.getAmount());
                 preparedStatement.setTimestamp(4, toSave.getDateOfTransaction());
                 preparedStatement.setString(5, toSave.getTransactionsType());
-
+                preparedStatement.setInt(6, toSave.getCategoryId());
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         return mapResultSetToTransaction(resultSet);
@@ -84,11 +84,11 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
     }
 
 
-    public BalanceSumsResult getBalanceSumBetweenDates(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    public BalanceSumsResult getBalanceSumsBetweenDates(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
         CallableStatement callableStatement = null;
 
         try {
-            String sql = "{ ? = call getBalanceSumBetweenDates(?, ?, ?) }";
+            String sql = "{ ? = call getbalancesumsbetweendates(accountId := ?, startDate := ?, endDate := ?) }";
             callableStatement = connection.prepareCall(sql);
 
             // Enregistrez le type de retour (OUT) pour la première variable
@@ -103,52 +103,44 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
             callableStatement.execute();
 
             // Récupérez le résultat de la procédure stockée
-            Object result = callableStatement.getObject(1);
+            ResultSet resultSet = (ResultSet) callableStatement.getObject(1);
 
             // Mapper le résultat dans votre objet BalanceSumsResult
             BalanceSumsResult balanceSumsResult = new BalanceSumsResult();
 
-            if (result instanceof Struct) {
-                Struct structResult = (Struct) result;
-                Object[] attributes = structResult.getAttributes();
-
-                balanceSumsResult.setTotalIncome((Double) attributes[0]);
-                balanceSumsResult.setTotalExpense((Double) attributes[1]);
+            if (resultSet.next()) {
+                balanceSumsResult.setTotalIncome(resultSet.getDouble("total_income"));
+                balanceSumsResult.setTotalExpense(resultSet.getDouble("total_expense"));
             }
-
 
             return balanceSumsResult;
         } catch (SQLException e) {
-            // Gérer l'exception
             e.printStackTrace();
             throw new RuntimeException("Error executing stored procedure", e);
         } finally {
-            // Fermez les ressources
-            try {
-                if (callableStatement != null) {
+            // Assurez-vous de fermer la ressource CallableStatement dans le bloc finally
+            if (callableStatement != null) {
+                try {
                     callableStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                // Gérer l'exception
-                e.printStackTrace();
             }
         }
     }
 
-     public BigDecimal getCategorySumByIdAccount(String accountId, LocalDateTime startDate, LocalDateTime endDate) {
+
+    public BigDecimal getCategorySumByIdAccount(String accountId, LocalDateTime startDate, LocalDateTime endDate) {
         BigDecimal restaurantSum = BigDecimal.ZERO;
         BigDecimal salarySum = BigDecimal.ZERO;
 
-        String sql = "SELECT t.amount, c.name " +
+        String sql = "SELECT t.amount, c.categoryName " +
                 "FROM Transaction t " +
-                "LEFT JOIN Category c ON t.categoryId = c.id " +
+                "LEFT JOIN Categories c ON t.categoryId = c.categoryId " +
                 "WHERE t.accountId = ? AND t.dateOfTransaction BETWEEN ? AND ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, accountId);
+            preparedStatement.setInt(1, Integer.parseInt(accountId));
             preparedStatement.setObject(2, startDate);
             preparedStatement.setObject(3, endDate);
 
@@ -172,63 +164,11 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
         return restaurantSum.add(salarySum);
     }
 
-    public BalanceSumsResult getBalanceSumBetweenDatesWithoutStoredProcedure(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
-        try {
-            // Récupérer toutes les transactions entre les dates spécifiées
-            
-            List<Transaction> transactions = TransactionCrudOperations.findAllByAccountIdAndDateBetween(accountId, startDate, endDate);
-
-            // Récupérer toutes les catégories
-            List<Category> categories = CategoryCrudOperations.findAll();
-
-            // Initialiser les sommes
-            double totalIncome = 0.0;
-            double totalExpense = 0.0;
-
-            // Parcourir les transactions pour calculer les sommes
-            for (Transaction transaction : transactions) {
-                double amount = transaction.getAmount();
-
-                if (amount > 0) {
-                    totalIncome += amount;
-                } else {
-                    totalExpense += amount;
-                }
-            }
-
-            // Mapper les catégories avec les transactions pour obtenir les sommes par catégorie
-            Map<String, Double> categorySums = new HashMap<>();
-            for (Category category : categories) {
-                double categorySum = transactions.stream()
-                        .filter(t -> t.getCategoryId() == category.getCategoryId())
-                        .mapToDouble(Transaction::getAmount)
-                        .sum();
-
-                categorySums.put(category.getCategoryName(), categorySum);
-            }
-
-            // Créer et retourner l'objet BalanceSumsResult
-            BalanceSumsResult balanceSumsResult = new BalanceSumsResult();
-            balanceSumsResult.setTotalIncome(totalIncome);
-            balanceSumsResult.setTotalExpense(totalExpense);
-            balanceSumsResult.setCategorySums(categorySums);
-
-            return balanceSumsResult;
-        } catch (Exception e) {
-            // Gérer l'exception
-            e.printStackTrace();
-            throw new RuntimeException("Error retrieving balance sums", e);
-        }
-    }
-
-    private static List<Transaction> findAllByAccountIdAndDateBetween(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
-    }
-
-public BigDecimal getEntriesAndExitsSumByIdAccount(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    public BigDecimal getEntriesAndExitsSumByIdAccount(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
         BigDecimal totalEntries = BigDecimal.ZERO;
         BigDecimal totalExits = BigDecimal.ZERO;
 
-        String sql = "SELECT t.amount, t.transactionType " +
+        String sql = "SELECT t.amount, t.transactionsType " +
                 "FROM \"transaction\" t " +
                 "WHERE t.accountId = ? AND t.dateOfTransaction BETWEEN ? AND ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -256,13 +196,13 @@ public BigDecimal getEntriesAndExitsSumByIdAccount(int accountId, LocalDateTime 
 
     private Transaction mapResultSetToTransaction(ResultSet resultSet) throws SQLException {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(resultSet.getInt("transactionId"));
-        transaction.setAccountId(resultSet.getInt("accountId"));
-        transaction.setLabelTransaction(resultSet.getString("labelTransaction"));
-        transaction.setAmount(resultSet.getDouble("amount"));
-        transaction.setDateOfTransaction(resultSet.getTimestamp("dateOfTransaction"));
-        transaction.setTransactionsType(resultSet.getString("transactionsType"));
-        transaction.setCategoryId(resultSet.getInt("categoryId"));
+        transaction.setTransactionId(resultSet.getInt(transaction.TRANSACTION_ID));
+        transaction.setAccountId(resultSet.getInt(transaction.ACCOUNT_ID));
+        transaction.setLabelTransaction(resultSet.getString(transaction.LABEL_TRANSACTION));
+        transaction.setAmount(resultSet.getDouble(transaction.AMOUNT));
+        transaction.setDateOfTransaction(resultSet.getTimestamp(transaction.DATE_OF_TRANSACTION));
+        transaction.setTransactionsType(resultSet.getString(transaction.TRANSACTIONSTYPE));
+        transaction.setCategoryId(resultSet.getInt(transaction.CATEGORY_ID));
         return transaction;
     }
 }

@@ -26,11 +26,11 @@ public class AccountExchangeRate {
         MEDIAN
     }
 
-    public double getExchangeRate(LocalDateTime date, int currencyId, ExchangeRateCalculationType calculationType) {
+    public double getExchangeRate(LocalDateTime date, int id_devise_source, ExchangeRateCalculationType calculationType) {
         String sql = "SELECT montant FROM CurrencyValue WHERE id_devise_source = ? AND date_effet::date = ? ORDER BY date_effet";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, currencyId);
+            preparedStatement.setInt(1, id_devise_source);
             preparedStatement.setObject(2, date);
 
             // Log de la requête SQL

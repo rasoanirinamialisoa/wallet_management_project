@@ -1,4 +1,4 @@
-CREATE FUNCTION getBalanceSumBetweenDates(accountId INT, startDate TIMESTAMP, endDate TIMESTAMP)
+CREATE FUNCTION getBalanceSumsBetweenDates(accountId INT, startDate TIMESTAMP, endDate TIMESTAMP)
     RETURNS TABLE (total_income DOUBLE PRECISION, total_expense DOUBLE PRECISION) AS $$
 BEGIN
     -- Calcul de la somme des entrées (salaire, etc.)
@@ -10,6 +10,7 @@ BEGIN
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
-DROP FUNCTION IF EXISTS getBalanceSumBetweenDates(INT, TIMESTAMP, TIMESTAMP);
+DROP FUNCTION IF EXISTS getBalanceSumsBetweenDates(INT, TIMESTAMP, TIMESTAMP);
 
-SELECT * FROM getBalanceSumBetweenDates(1, '2023-01-01', '2023-12-31');
+SELECT * FROM getBalanceSumsBetweenDates(1, '2023-01-01', '2023-12-31');
+
